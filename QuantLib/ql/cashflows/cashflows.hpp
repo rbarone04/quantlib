@@ -3,7 +3,7 @@
 /*
  Copyright (C) 2005, 2006 StatPro Italia srl
  Copyright (C) 2005 Charles Whitmore
- Copyright (C) 2007, 2008, 2009, 2010, 2011 Ferdinando Ametrano
+ Copyright (C) 2007-2011, 2014, 2015 Ferdinando Ametrano
  Copyright (C) 2008 Toyin Akin
 
  This file is part of QuantLib, a free-software/open-source library
@@ -30,6 +30,7 @@
 #include <ql/cashflows/duration.hpp>
 #include <ql/cashflow.hpp>
 #include <ql/interestrate.hpp>
+#include <ql/termstructures/yieldtermstructure.hpp>
 #include <boost/shared_ptr.hpp>
 
 namespace QuantLib {
@@ -45,11 +46,23 @@ namespace QuantLib {
       public:
         //! \name Date functions
         //@{
-        static Date startDate(const Leg& leg);
-        static Date maturityDate(const Leg& leg);
+        static Date startDate(const Leg& leg
+                              #ifdef QL_DEPRECATED
+                              , bool unsorted = true
+                              #endif
+                              );
+        static Date maturityDate(const Leg& leg
+                              #ifdef QL_DEPRECATED
+                              , bool unsorted = true
+                              #endif
+                              );
         static bool isExpired(const Leg& leg,
                               bool includeSettlementDateFlows,
-                              Date settlementDate = Date());
+                              Date settlementDate = Date()
+                              #ifdef QL_DEPRECATED
+                              , bool unsorted = true
+                              #endif
+                              );
         //@}
 
         //! \name CashFlow functions
@@ -145,7 +158,21 @@ namespace QuantLib {
                         const YieldTermStructure& discountCurve,
                         bool includeSettlementDateFlows,
                         Date settlementDate = Date(),
-                        Date npvDate = Date());
+                        Date npvDate = Date()
+                        #ifdef QL_DEPRECATED
+                        , bool unsorted = true
+                        #endif
+                        );
+        //! NPV of the cash flows.
+        /*! The NPV is the sum of the cash flows, each discounted
+            according to the given term structure. The pointer to
+            the first relevant one is provided for computational
+            efficiency, assuming ordered cashflows
+        */
+        static Real npv(const Leg& leg,
+                        const YieldTermStructure& discountCurve,
+                        Leg::const_iterator firstRelevantCashflow,
+                        Date npvDate);
         //! Basis-point sensitivity of the cash flows.
         /*! The result is the change in NPV due to a uniform
             1-basis-point change in the rate paid by the cash
@@ -156,7 +183,11 @@ namespace QuantLib {
                         const YieldTermStructure& discountCurve,
                         bool includeSettlementDateFlows,
                         Date settlementDate = Date(),
-                        Date npvDate = Date());
+                        Date npvDate = Date()
+                        #ifdef QL_DEPRECATED
+                        , bool unsorted = true
+                        #endif
+                        );
 
         //@{
         //! NPV and BPS of the cash flows.
@@ -169,7 +200,11 @@ namespace QuantLib {
                            Date settlementDate,
                            Date npvDate,
                            Real& npv,
-                           Real& bps);
+                           Real& bps
+                           #ifdef QL_DEPRECATED
+                           , bool unsorted = true
+                           #endif
+                           );
 
         //! At-the-money rate of the cash flows.
         /*! The result is the fixed rate for which a fixed rate cash flow
@@ -182,7 +217,11 @@ namespace QuantLib {
                             bool includeSettlementDateFlows,
                             Date settlementDate = Date(),
                             Date npvDate = Date(),
-                            Real npv = Null<Real>());
+                            Real npv = Null<Real>()
+                            #ifdef QL_DEPRECATED
+                            , bool unsorted = true
+                            #endif
+                            );
         //@}
 
         //! \name Yield (a.k.a. Internal Rate of Return, i.e. IRR) functions
@@ -200,7 +239,17 @@ namespace QuantLib {
                         const InterestRate& yield,
                         bool includeSettlementDateFlows,
                         Date settlementDate = Date(),
-                        Date npvDate = Date());
+                        Date npvDate = Date()
+                        #ifdef QL_DEPRECATED
+                        , bool unsorted = true
+                        #endif
+                        );
+        //! NPV of the cash flows.
+        /*! The NPV is the sum of the cash flows, each discounted
+            according to the given constant interest rate.  The result
+            is affected by the choice of the interest-rate compounding
+            and the relative frequency and day counter.
+        */
         static Real npv(const Leg& leg,
                         Rate yield,
                         const DayCounter& dayCounter,
@@ -208,7 +257,23 @@ namespace QuantLib {
                         Frequency frequency,
                         bool includeSettlementDateFlows,
                         Date settlementDate = Date(),
-                        Date npvDate = Date());
+                        Date npvDate = Date()
+                        #ifdef QL_DEPRECATED
+                        , bool unsorted = true
+                        #endif
+                        );
+        //! NPV of the cash flows.
+        /*! The NPV is the sum of the cash flows, each discounted
+            according to the given constant interest rate.  The result
+            is affected by the choice of the interest-rate compounding
+            and the relative frequency and day counter.  The pointer to
+            the first relevant one is provided for computational
+            efficiency, assuming ordered cashflows
+        */
+        static Real npv(const Leg& leg,
+                        const InterestRate& yield,
+                        Leg::const_iterator firstRelevantCashflow,
+                        Date npvDate);
         //! Basis-point sensitivity of the cash flows.
         /*! The result is the change in NPV due to a uniform
             1-basis-point change in the rate paid by the cash
@@ -221,7 +286,11 @@ namespace QuantLib {
                         const InterestRate& yield,
                         bool includeSettlementDateFlows,
                         Date settlementDate = Date(),
-                        Date npvDate = Date());
+                        Date npvDate = Date()
+                        #ifdef QL_DEPRECATED
+                        , bool unsorted = true
+                        #endif
+                        );
         static Real bps(const Leg& leg,
                         Rate yield,
                         const DayCounter& dayCounter,
@@ -229,7 +298,11 @@ namespace QuantLib {
                         Frequency frequency,
                         bool includeSettlementDateFlows,
                         Date settlementDate = Date(),
-                        Date npvDate = Date());
+                        Date npvDate = Date()
+                        #ifdef QL_DEPRECATED
+                        , bool unsorted = true
+                        #endif
+                        );
         //! Implied internal rate of return.
         /*! The function verifies
             the theoretical existance of an IRR and numerically
@@ -243,6 +316,16 @@ namespace QuantLib {
                           bool includeSettlementDateFlows,
                           Date settlementDate = Date(),
                           Date npvDate = Date(),
+                          Real accuracy = 1.0e-10,
+                          Size maxIterations = 100,
+                          Rate guess = 0.05);
+        static Rate yield(const Leg& leg,
+                          Real npv,
+                          const DayCounter& dayCounter,
+                          Compounding compounding,
+                          Frequency frequency,
+                          Leg::const_iterator i,
+                          Date npvDate,
                           Real accuracy = 1.0e-10,
                           Size maxIterations = 100,
                           Rate guess = 0.05);
@@ -277,6 +360,11 @@ namespace QuantLib {
                              bool includeSettlementDateFlows,
                              Date settlementDate = Date(),
                              Date npvDate = Date());
+        static Time duration(const Leg& leg,
+                             const InterestRate& yield,
+                             Duration::Type type,
+                             Leg::const_iterator i,
+                             Date npvDate);
         static Time duration(const Leg& leg,
                              Rate yield,
                              const DayCounter& dayCounter,
@@ -401,6 +489,40 @@ namespace QuantLib {
         //@}
 
     };
+
+    inline Real CashFlows::npv(const Leg& leg,
+                               const YieldTermStructure& discountCurve,
+                               Leg::const_iterator i,
+                               Date npvDate) {
+        Real totalNPV = 0.0;
+        for (; i<leg.end(); ++i) {
+            CashFlow& cf = *(*i);
+            totalNPV += cf.amount() * discountCurve.discount(cf.date());
+        }
+
+        return totalNPV/discountCurve.discount(npvDate);
+    }
+
+    inline Real CashFlows::npv(const Leg& leg,
+                               Rate yield,
+                               const DayCounter& dc,
+                               Compounding comp,
+                               Frequency freq,
+                               bool includeSettlementDateFlows,
+                               Date settlementDate,
+                               Date npvDate
+                               #ifdef QL_DEPRECATED
+                               , bool unsorted
+                               #endif
+                               ) {
+        return npv(leg, InterestRate(yield, dc, comp, freq),
+                       includeSettlementDateFlows,
+                       settlementDate, npvDate
+                       #ifdef QL_DEPRECATED
+                       , unsorted
+                       #endif
+                       );
+    }
 
 }
 
