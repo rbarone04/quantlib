@@ -4,6 +4,7 @@
  Copyright (C) 2000, 2001, 2002, 2003 RiskMap srl
  Copyright (C) 2003, 2004, 2005, 2006, 2007 StatPro Italia srl
  Copyright (C) 2006 Piter Dias
+ Copyright (C) 2015 Riccardo Barone
 
  This file is part of QuantLib, a free-software/open-source library
  for financial quantitative analysts and developers - http://quantlib.org/
@@ -166,6 +167,17 @@ namespace QuantLib {
             bool isWeekend(Weekday) const;
             //! expressed relative to first day of year
             static Day easterMonday(Year);
+        };
+        //! partial calendar implementation
+        /*! This class provides the means of determining the Chinese
+        New Year for a given year, as well as specifying Saturdays 
+        and Sundays as weekend days.
+        */
+        class ChineseImpl : public Impl {
+        public:
+            bool isWeekend(Weekday) const;
+            //! expressed relative to first day of year
+            static Day newYear(Year);
         };
     };
 
