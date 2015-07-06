@@ -102,7 +102,8 @@ namespace QuantLib {
         bool isEndOfMonth(const Date& d) const;
         //! last business day of the month to which the given date belongs
         Date endOfMonth(const Date& d) const;
-
+        //Returns the day of the Chinese New Year for a giver year
+        Day ChineseNewYear(const Year& y);
         /*! Adds a date to the set of holidays for the given calendar. */
         void addHoliday(const Date&);
         /*! Removes a date from the set of holidays for the given calendar. */
@@ -143,6 +144,7 @@ namespace QuantLib {
                                        const Date& to,
                                        bool includeFirst = true,
                                        bool includeLast = false) const;
+
         //@}
 
       protected:
@@ -167,18 +169,7 @@ namespace QuantLib {
             bool isWeekend(Weekday) const;
             //! expressed relative to first day of year
             static Day easterMonday(Year);
-        };
-        //! partial calendar implementation
-        /*! This class provides the means of determining the Chinese
-        New Year for a given year, as well as specifying Saturdays 
-        and Sundays as weekend days.
-        */
-        class ChineseImpl : public Impl {
-        public:
-            bool isWeekend(Weekday) const;
-            //! expressed relative to first day of year
-            static Day newYear(Year);
-        };
+        };        
     };
 
     /*! Returns <tt>true</tt> iff the two calendars belong to the same
