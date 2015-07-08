@@ -4,6 +4,7 @@
  Copyright (C) 2000, 2001, 2002, 2003 RiskMap srl
  Copyright (C) 2003, 2004, 2005, 2006, 2007 StatPro Italia srl
  Copyright (C) 2006 Piter Dias
+ Copyright (C) 2015 Riccardo Barone
 
  This file is part of QuantLib, a free-software/open-source library
  for financial quantitative analysts and developers - http://quantlib.org/
@@ -101,7 +102,8 @@ namespace QuantLib {
         bool isEndOfMonth(const Date& d) const;
         //! last business day of the month to which the given date belongs
         Date endOfMonth(const Date& d) const;
-
+        //Returns the day of the Chinese New Year for a giver year
+        Day ChineseNewYear(const Year& y);
         /*! Adds a date to the set of holidays for the given calendar. */
         void addHoliday(const Date&);
         /*! Removes a date from the set of holidays for the given calendar. */
@@ -142,6 +144,7 @@ namespace QuantLib {
                                        const Date& to,
                                        bool includeFirst = true,
                                        bool includeLast = false) const;
+
         //@}
 
       protected:
@@ -166,7 +169,7 @@ namespace QuantLib {
             bool isWeekend(Weekday) const;
             //! expressed relative to first day of year
             static Day easterMonday(Year);
-        };
+        };        
     };
 
     /*! Returns <tt>true</tt> iff the two calendars belong to the same
